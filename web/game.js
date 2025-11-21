@@ -66,6 +66,7 @@ class TronWormClient {
         this.winnerText = document.getElementById('winner-text');
         this.finalScores = document.getElementById('final-scores');
         this.nextRoundBtn = document.getElementById('next-round-btn');
+        this.soloRestartBtn = document.getElementById('solo-restart-btn');
         this.quitBtn = document.getElementById('quit-btn');
 
         // Load player name from localStorage
@@ -89,6 +90,7 @@ class TronWormClient {
 
         // Round end
         this.nextRoundBtn.addEventListener('click', () => this.toggleReady());
+        this.soloRestartBtn.addEventListener('click', () => this.startSolo());
         this.quitBtn.addEventListener('click', () => this.disconnect());
 
         // Keyboard controls
@@ -335,6 +337,15 @@ class TronWormClient {
             this.nextRoundBtn.textContent = 'Ready for Next Round';
             this.nextRoundBtn.classList.remove('btn-danger');
             this.nextRoundBtn.classList.add('btn-success');
+        }
+
+        // Show/hide solo restart button based on player count
+        if (worms.length === 1) {
+            this.soloRestartBtn.style.display = 'block';
+            this.nextRoundBtn.style.display = 'none';
+        } else {
+            this.soloRestartBtn.style.display = 'none';
+            this.nextRoundBtn.style.display = 'block';
         }
     }
 

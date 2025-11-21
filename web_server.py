@@ -105,18 +105,20 @@ class WebGameServer:
             ready = msg.get('data', {}).get('ready', True)
             self.game_state.set_player_ready(player_id, ready)
 
-            # Check if all players are ready
-            if self.game_state.all_players_ready() and self.game_state.state == STATE_LOBBY:
-                self.game_state.start_countdown()
+            # Check if all players are ready (works in lobby or after round ends)
+            if self.game_state.all_players_ready():
+                if self.game_state.state == STATE_LOBBY or self.game_state.state == STATE_ROUND_END:
+                    self.game_state.start_countdown()
 
             await self.broadcast_state()
 
         elif msg.get('type') == MSG_FORCE_START:
             # Force start for solo/practice mode (requires at least 1 player)
-            if len(self.game_state.worms) >= 1 and self.game_state.state == STATE_LOBBY:
-                print(f"🎮 Force start initiated by player '{self.player_names.get(player_id)}'")
-                self.game_state.start_countdown()
-                await self.broadcast_state()
+            if len(self.game_state.worms) >= 1:
+                if self.game_state.state == STATE_LOBBY or self.game_state.state == STATE_ROUND_END:
+                    print(f"🎮 Force start initiated by player '{self.player_names.get(player_id)}'")
+                    self.game_state.start_countdown()
+                    await self.broadcast_state()
 
         elif msg.get('type') == MSG_INPUT:
             direction = msg.get('data', {}).get('direction')

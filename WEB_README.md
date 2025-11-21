@@ -219,7 +219,7 @@ pip install websockets
 ## 📁 Project Structure
 
 ```
-expert-broccoli/
+TronWorm/
 ├── web_server.py          # WebSocket game server
 ├── web/
 │   ├── index.html         # Game UI
@@ -227,6 +227,8 @@ expert-broccoli/
 │   └── game.js            # Client logic & rendering
 ├── game.py                # Core game logic (shared)
 ├── config.py              # Game configuration (shared)
+├── Dockerfile             # Docker image
+├── docker-compose.yml     # Docker orchestration
 └── requirements-web.txt   # Web dependencies
 ```
 

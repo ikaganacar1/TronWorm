@@ -53,7 +53,8 @@ Control a constantly moving worm that leaves a trail behind it. Avoid crashing i
 
 1. **Clone or download this repository:**
    ```bash
-   cd expert-broccoli
+   git clone https://github.com/ikaganacar1/TronWorm.git
+   cd TronWorm
    ```
 
 2. **Install dependencies:**
@@ -247,7 +248,7 @@ DEFAULT_PORT = 9999         # Terminal server port
 ## 📁 Project Structure
 
 ```
-expert-broccoli/
+TronWorm/
 ├── web/
 │   ├── index.html      # Web game UI
 │   ├── style.css       # Tron-themed styling
@@ -259,7 +260,10 @@ expert-broccoli/
 ├── renderer.py         # Terminal rendering with curses
 ├── protocol.py         # Network message protocol
 ├── config.py           # Game configuration
-└── README.md           # This file
+├── Dockerfile          # Docker image definition
+├── docker-compose.yml  # Docker orchestration
+├── README.md           # This file
+└── DOCKER.md           # Docker deployment guide
 ```
 
 ---

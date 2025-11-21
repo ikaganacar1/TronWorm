@@ -403,6 +403,12 @@ class GameState:
 
     def to_dict(self):
         """Convert game state to dictionary for network transmission"""
+        # Calculate countdown remaining instead of sending absolute time
+        countdown_remaining = None
+        if self.countdown_start and self.state == STATE_COUNTDOWN:
+            elapsed = time.time() - self.countdown_start
+            countdown_remaining = max(0, COUNTDOWN_SECONDS - elapsed)
+
         return {
             'width': self.width,
             'height': self.height,
@@ -412,7 +418,7 @@ class GameState:
             'scores': self.scores,
             'round_number': self.round_number,
             'current_speed': self.current_speed,
-            'countdown_start': self.countdown_start,
+            'countdown_remaining': countdown_remaining,
             'last_winner': self.last_winner,
             'move_count': self.move_count,
             'bonuses': [bonus.to_dict() for bonus in self.bonuses]

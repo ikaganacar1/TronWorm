@@ -281,9 +281,8 @@ class TronWormClient {
     }
 
     updateCountdown() {
-        if (this.gameState.countdown_start) {
-            const elapsed = (Date.now() / 1000) - this.gameState.countdown_start;
-            const remaining = Math.max(0, 3 - Math.floor(elapsed));
+        if (this.gameState.countdown_remaining !== null && this.gameState.countdown_remaining !== undefined) {
+            const remaining = Math.ceil(this.gameState.countdown_remaining);
 
             if (remaining > 0) {
                 this.countdownNumber.textContent = remaining;

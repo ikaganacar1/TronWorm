@@ -217,7 +217,20 @@ class GameState:
         # Wait at least 3 moves to let worms separate from start positions
         if self.move_count >= 3:
             alive_worms = [w for w in self.worms.values() if w.alive]
-            if len(alive_worms) <= 1:
+            total_worms = len(self.worms)
+
+            # Different win conditions for single-player vs multiplayer
+            should_end = False
+            if total_worms == 1:
+                # Single-player: end only when player dies
+                if len(alive_worms) == 0:
+                    should_end = True
+            else:
+                # Multiplayer: end when 1 or fewer alive
+                if len(alive_worms) <= 1:
+                    should_end = True
+
+            if should_end:
                 self._end_round()
 
     def _check_collisions(self):
@@ -255,12 +268,24 @@ class GameState:
 
         # Award point to winner
         alive_worms = [w for w in self.worms.values() if w.alive]
-        if len(alive_worms) == 1:
-            winner = alive_worms[0]
-            self.scores[winner.player_id] += 1
-            self.last_winner = winner.name
+        total_worms = len(self.worms)
+
+        if total_worms == 1:
+            # Single-player mode
+            if len(alive_worms) == 0:
+                self.last_winner = "Game Over"
+                # Don't change score in single-player
+            else:
+                # Shouldn't happen, but handle it
+                self.last_winner = alive_worms[0].name
         else:
-            self.last_winner = "Draw"
+            # Multiplayer mode
+            if len(alive_worms) == 1:
+                winner = alive_worms[0]
+                self.scores[winner.player_id] += 1
+                self.last_winner = winner.name
+            else:
+                self.last_winner = "Draw"
 
     def handle_input(self, player_id, direction):
         """Handle player input"""

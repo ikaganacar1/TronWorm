@@ -1,0 +1,21 @@
+# Tron Worm - Multiplayer Terminal Game
+#
+# No external dependencies required!
+# This game uses only Python standard library modules:
+#
+# - socket (networking)
+# - threading (concurrent connections)
+# - curses (terminal UI)
+# - json (message serialization)
+# - struct (binary data handling)
+# - time (timing and delays)
+# - argparse (command-line arguments)
+# - collections (deque for worm body)
+#
+# All of these are included with Python 3.6+ by default on Linux.
+#
+# Requirements:
+# - Python 3.6 or higher
+# - Linux or Unix-like OS (for curses support)
+# - Terminal with color support
+# - Local network for multiplayer

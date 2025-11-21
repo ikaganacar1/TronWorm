@@ -49,6 +49,7 @@ class TronWormClient {
         this.playerCount = document.getElementById('player-count');
         this.playerList = document.getElementById('player-list');
         this.readyBtn = document.getElementById('ready-btn');
+        this.soloBtn = document.getElementById('solo-btn');
         this.disconnectBtn = document.getElementById('disconnect-btn');
 
         // Countdown screen
@@ -83,6 +84,7 @@ class TronWormClient {
 
         // Lobby
         this.readyBtn.addEventListener('click', () => this.toggleReady());
+        this.soloBtn.addEventListener('click', () => this.startSolo());
         this.disconnectBtn.addEventListener('click', () => this.disconnect());
 
         // Round end
@@ -247,6 +249,15 @@ class TronWormClient {
             this.readyBtn.classList.remove('btn-danger');
             this.readyBtn.classList.add('btn-success');
         }
+
+        // Show/hide solo button based on player count
+        if (worms.length === 1) {
+            this.soloBtn.style.display = 'block';
+            this.readyBtn.style.display = 'none';
+        } else {
+            this.soloBtn.style.display = 'none';
+            this.readyBtn.style.display = 'block';
+        }
     }
 
     updateCountdown() {
@@ -332,6 +343,13 @@ class TronWormClient {
         this.send({
             type: 'ready',
             data: { ready: this.isReady }
+        });
+    }
+
+    startSolo() {
+        this.send({
+            type: 'force_start',
+            data: {}
         });
     }
 

@@ -111,6 +111,13 @@ class WebGameServer:
 
             await self.broadcast_state()
 
+        elif msg.get('type') == MSG_FORCE_START:
+            # Force start for solo/practice mode (requires at least 1 player)
+            if len(self.game_state.worms) >= 1 and self.game_state.state == STATE_LOBBY:
+                print(f"🎮 Force start initiated by player '{self.player_names.get(player_id)}'")
+                self.game_state.start_countdown()
+                await self.broadcast_state()
+
         elif msg.get('type') == MSG_INPUT:
             direction = msg.get('data', {}).get('direction')
             if direction:

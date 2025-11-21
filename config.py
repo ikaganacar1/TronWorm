@@ -69,3 +69,4 @@ MSG_DISCONNECT = 'disconnect'
 MSG_ERROR = 'error'
 MSG_CHAT = 'chat'
 MSG_START_COUNTDOWN = 'start_countdown'
+MSG_FORCE_START = 'force_start'  # Force start for solo/practice mode

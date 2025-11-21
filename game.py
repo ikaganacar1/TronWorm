@@ -55,9 +55,15 @@ class Worm:
         self.trail_set.add(new_head)
 
         # Remove old positions if trail exceeds max length
+        # This handles the case where deque maxlen is larger than max_trail_length
         while len(self.trail) > self.max_trail_length:
             oldest = self.trail.popleft()
             self.trail_set.discard(oldest)
+
+        # Safety: Also remove positions that fell off the deque due to maxlen
+        # Keep trail_set synchronized with actual trail content
+        trail_positions = set(self.trail)
+        self.trail_set = trail_positions
 
     def increase_trail_length(self, amount):
         """Increase maximum trail length"""
@@ -254,12 +260,13 @@ class GameState:
                 x, y, direction = self.width // 2, self.height // 2, 'RIGHT'
 
             # Completely reset worm state
+            # IMPORTANT: Reset max_trail_length FIRST before creating deque!
+            worm.max_trail_length = TRAIL_LENGTH  # Reset trail length to default
             worm.body = deque([(x, y)])
-            worm.trail = deque([(x, y)], maxlen=worm.max_trail_length)  # Use worm's max trail length
+            worm.trail = deque([(x, y)], maxlen=worm.max_trail_length)
             worm.trail_set = {(x, y)}  # Reset trail set for collision detection
             worm.direction = direction
             worm.alive = True
-            worm.max_trail_length = TRAIL_LENGTH  # Reset trail length to default
             color_id += 1
 
         # Spawn initial bonuses

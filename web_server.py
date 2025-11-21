@@ -29,7 +29,7 @@ class WebGameServer:
         self.running = False
         self.next_player_id = 1
 
-    async def handle_client(self, websocket, path):
+    async def handle_client(self, websocket):
         """Handle a WebSocket client connection"""
         player_id = None
 

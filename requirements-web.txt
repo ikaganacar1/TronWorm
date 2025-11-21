@@ -1,0 +1,5 @@
+# Web version requirements
+# Install with: pip install -r requirements-web.txt
+
+# WebSocket support for real-time communication
+websockets>=12.0

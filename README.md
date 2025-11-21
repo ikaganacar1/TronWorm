@@ -1,6 +1,30 @@
-# 🐍 Tron Worm - Multiplayer Terminal Snake Battle
+# 🐍 Tron Worm - Multiplayer Snake Battle
 
-A fast-paced multiplayer Tron-style worm game for terminal/CLI that runs over local network.
+A fast-paced multiplayer Tron-style worm game available in two versions:
+
+- **🌐 Web Version** - Play in your browser! (RECOMMENDED)
+- **💻 Terminal Version** - Classic CLI experience
+
+## 🚀 Quick Start
+
+### Web Version (Easiest!)
+
+```bash
+pip install websockets
+python3 web_server.py
+# Open http://localhost:8080 in your browser
+```
+
+**📖 See [WEB_README.md](WEB_README.md) for complete web version documentation**
+
+### Terminal Version
+
+```bash
+python3 server.py          # Start server
+python3 client.py localhost --name YourName  # Connect
+```
+
+---
 
 ## 🎮 Game Description
 

@@ -1,0 +1,382 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Screen Management */
+.screen {
+    display: none;
+    width: 100%;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.screen.active {
+    display: flex;
+}
+
+/* Container */
+.container {
+    background: rgba(0, 0, 0, 0.7);
+    border: 3px solid #00ff00;
+    border-radius: 10px;
+    padding: 40px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+}
+
+/* Typography */
+.title {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 10px;
+    color: #00ff00;
+    text-shadow: 0 0 10px #00ff00;
+    letter-spacing: 5px;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #88ff88;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #00ff00;
+    font-weight: bold;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #00ff00;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1rem;
+    font-family: 'Courier New', monospace;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #00ffff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+/* Buttons */
+.btn {
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.btn-primary {
+    background: #00ff00;
+    color: #000;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background: #00ff88;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+}
+
+.btn-success {
+    background: #00ff00;
+    color: #000;
+}
+
+.btn-success:hover {
+    background: #00ff88;
+}
+
+.btn-danger {
+    background: #ff0000;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background: #ff4444;
+}
+
+.btn:disabled {
+    background: #555;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Status Messages */
+.status-message {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    min-height: 20px;
+}
+
+.status-message.error {
+    background: rgba(255, 0, 0, 0.3);
+    border: 1px solid #ff0000;
+}
+
+.status-message.success {
+    background: rgba(0, 255, 0, 0.3);
+    border: 1px solid #00ff00;
+}
+
+.status-message.info {
+    background: rgba(0, 255, 255, 0.3);
+    border: 1px solid #00ffff;
+}
+
+/* Lobby */
+.lobby-section {
+    margin: 30px 0;
+}
+
+.lobby-section h2 {
+    color: #00ff00;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.player-list {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #00ff00;
+    border-radius: 5px;
+    padding: 15px;
+    min-height: 150px;
+}
+
+.player-item {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+}
+
+.player-item .ready-mark {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.player-item .you-badge {
+    margin-left: auto;
+    background: rgba(255, 255, 0, 0.3);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 0.8rem;
+}
+
+.lobby-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.lobby-actions button {
+    flex: 1;
+}
+
+.instructions {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid #00ff00;
+    border-radius: 5px;
+}
+
+.instructions h3 {
+    color: #00ff00;
+    margin-bottom: 10px;
+}
+
+.instructions p {
+    margin: 5px 0;
+}
+
+/* Countdown */
+.countdown-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.countdown-number {
+    font-size: 15rem;
+    font-weight: bold;
+    color: #00ff00;
+    text-shadow: 0 0 50px #00ff00;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+/* Game Screen */
+.game-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #000;
+}
+
+.game-header {
+    padding: 15px 30px;
+    background: rgba(0, 0, 0, 0.9);
+    border-bottom: 2px solid #00ff00;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.game-info {
+    display: flex;
+    gap: 30px;
+    font-size: 1.1rem;
+}
+
+.game-info strong {
+    color: #00ff00;
+}
+
+.scores {
+    display: flex;
+    gap: 20px;
+    font-size: 1rem;
+}
+
+.score-item {
+    padding: 5px 10px;
+    border-radius: 3px;
+}
+
+#game-canvas {
+    flex: 1;
+    width: 100%;
+    background: #000;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.game-footer {
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.9);
+    border-top: 2px solid #00ff00;
+    text-align: center;
+    color: #00ff00;
+}
+
+/* Round End */
+.winner-text {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 30px;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.scores-section {
+    margin: 30px 0;
+}
+
+.scores-section h2 {
+    color: #00ff00;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.final-scores {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #00ff00;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.score-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    font-size: 1.2rem;
+}
+
+.score-row .player-name {
+    font-weight: bold;
+}
+
+.score-row .player-score {
+    color: #00ff00;
+    font-weight: bold;
+}
+
+.round-end-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.round-end-actions button {
+    flex: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+    }
+
+    .container {
+        padding: 20px;
+    }
+
+    .game-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .countdown-number {
+        font-size: 10rem;
+    }
+}

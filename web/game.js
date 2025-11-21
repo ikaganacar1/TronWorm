@@ -24,6 +24,7 @@ class TronWormClient {
         this.canvas = null;
         this.ctx = null;
         this.isReady = false;
+        this.previousState = null;
 
         this.initElements();
         this.initEventListeners();
@@ -196,17 +197,24 @@ class TronWormClient {
         if (state === STATE_LOBBY) {
             this.showScreen('lobby');
             this.updateLobby();
+            this.previousState = state;
         } else if (state === STATE_COUNTDOWN) {
             this.showScreen('countdown');
             this.updateCountdown();
+            this.previousState = state;
         } else if (state === STATE_PLAYING) {
             this.showScreen('game');
             this.updatePlaying();
             this.render();
+            this.previousState = state;
         } else if (state === STATE_ROUND_END) {
             this.showScreen('roundEnd');
             this.updateRoundEnd();
-            this.isReady = false;
+            // Only reset isReady when first entering round end state
+            if (this.previousState !== STATE_ROUND_END) {
+                this.isReady = false;
+            }
+            this.previousState = state;
         }
     }
 
@@ -313,6 +321,14 @@ class TronWormClient {
             const row = document.createElement('div');
             row.className = 'score-row';
             row.style.background = `${COLORS[worm.color_id]}22`;
+
+            // Add ready indicator for multiplayer
+            if (worms.length > 1) {
+                const readyMark = document.createElement('span');
+                readyMark.style.marginRight = '8px';
+                readyMark.textContent = this.gameState.ready_players.includes(worm.player_id) ? '✓' : ' ';
+                row.appendChild(readyMark);
+            }
 
             const name = document.createElement('span');
             name.className = 'player-name';

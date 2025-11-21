@@ -26,6 +26,11 @@ class TronWormClient {
         this.isReady = false;
         this.previousState = null;
 
+        // Input buffering to prevent rapid key press deaths
+        this.lastSentDirection = null;
+        this.lastInputTime = 0;
+        this.inputCooldown = 50; // Minimum 50ms between direction changes
+
         this.initElements();
         this.initEventListeners();
     }
@@ -201,6 +206,11 @@ class TronWormClient {
         } else if (state === STATE_COUNTDOWN) {
             this.showScreen('countdown');
             this.updateCountdown();
+            // Reset input buffer when countdown starts
+            if (this.previousState !== STATE_COUNTDOWN) {
+                this.lastSentDirection = null;
+                this.lastInputTime = 0;
+            }
             this.previousState = state;
         } else if (state === STATE_PLAYING) {
             this.showScreen('game');
@@ -380,6 +390,16 @@ class TronWormClient {
         });
     }
 
+    isOppositeDirection(dir1, dir2) {
+        const opposites = {
+            'UP': 'DOWN',
+            'DOWN': 'UP',
+            'LEFT': 'RIGHT',
+            'RIGHT': 'LEFT'
+        };
+        return opposites[dir1] === dir2;
+    }
+
     handleKeyPress(e) {
         if (!this.gameState || this.gameState.state !== STATE_PLAYING) {
             return;
@@ -418,10 +438,39 @@ class TronWormClient {
         }
 
         if (direction) {
+            const now = Date.now();
+
+            // Check cooldown - prevent too rapid inputs
+            if (now - this.lastInputTime < this.inputCooldown) {
+                return;
+            }
+
+            // Get current worm direction
+            const myWorm = this.gameState.worms[this.playerId];
+            if (!myWorm || !myWorm.alive) {
+                return;
+            }
+
+            const currentDirection = myWorm.direction;
+
+            // Prevent opposite direction (would cause instant death)
+            if (this.isOppositeDirection(currentDirection, direction)) {
+                return;
+            }
+
+            // Prevent sending the same direction repeatedly
+            if (direction === this.lastSentDirection) {
+                return;
+            }
+
+            // Send the direction change
             this.send({
                 type: 'input',
                 data: { direction: direction }
             });
+
+            this.lastSentDirection = direction;
+            this.lastInputTime = now;
         }
     }
 

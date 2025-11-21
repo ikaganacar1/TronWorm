@@ -177,32 +177,63 @@ class WebGameServer:
 
     async def start_websocket_server(self):
         """Start the WebSocket server"""
-        self.running = True
-        print(f"🌐 WebSocket server started on ws://{self.host}:{self.ws_port}")
+        try:
+            self.running = True
+            print(f"🌐 WebSocket server started on ws://{self.host}:{self.ws_port}")
 
-        async with websockets.serve(self.handle_client, self.host, self.ws_port):
-            # Start game loop
-            await self.game_loop()
+            async with websockets.serve(self.handle_client, self.host, self.ws_port):
+                # Start game loop
+                await self.game_loop()
+        except OSError as e:
+            if e.errno == 98:  # Address already in use
+                print(f"\n❌ ERROR: WebSocket port {self.ws_port} is already in use!")
+                print("\n🔧 Solutions:")
+                print(f"1. Use a different port:")
+                print(f"   python3 web_server.py --ws-port 8766")
+                print(f"\n2. Find what's using port {self.ws_port}:")
+                print(f"   sudo lsof -i :{self.ws_port}")
+                print(f"\n3. Kill the process using the port")
+            else:
+                print(f"❌ WebSocket Server error: {e}")
+            import sys
+            sys.exit(1)
 
     def start_http_server(self):
         """Start HTTP server for serving static files"""
-        # Change to web directory
-        web_dir = Path(__file__).parent / 'web'
-        os.chdir(web_dir)
+        try:
+            # Change to web directory
+            web_dir = Path(__file__).parent / 'web'
+            os.chdir(web_dir)
 
-        class CustomHandler(SimpleHTTPRequestHandler):
-            def log_message(self, format, *args):
-                pass  # Suppress HTTP logs
+            class CustomHandler(SimpleHTTPRequestHandler):
+                def log_message(self, format, *args):
+                    pass  # Suppress HTTP logs
 
-        httpd = HTTPServer((self.host, self.http_port), CustomHandler)
-        print(f"🌐 HTTP server started on http://{self.host}:{self.http_port}")
-        print(f"📊 Grid size: {self.game_state.width}x{self.game_state.height}")
-        print(f"👥 Max players: {MAX_PLAYERS}")
-        print(f"\n🎮 Open in browser: http://localhost:{self.http_port}")
-        print(f"   Or: http://<your-ip>:{self.http_port}\n")
-        print("Waiting for players to connect...\n")
+            httpd = HTTPServer((self.host, self.http_port), CustomHandler)
+            print(f"🌐 HTTP server started on http://{self.host}:{self.http_port}")
+            print(f"📊 Grid size: {self.game_state.width}x{self.game_state.height}")
+            print(f"👥 Max players: {MAX_PLAYERS}")
+            print(f"\n🎮 Open in browser: http://localhost:{self.http_port}")
+            print(f"   Or: http://<your-ip>:{self.http_port}\n")
+            print("Waiting for players to connect...\n")
 
-        httpd.serve_forever()
+            httpd.serve_forever()
+        except OSError as e:
+            if e.errno == 98:  # Address already in use
+                print(f"\n❌ ERROR: Port {self.http_port} is already in use!")
+                print("\n🔧 Solutions:")
+                print(f"1. Use a different port:")
+                print(f"   python3 web_server.py --http-port 8081")
+                print(f"\n2. Find what's using port {self.http_port}:")
+                print(f"   sudo lsof -i :{self.http_port}")
+                print(f"   # or")
+                print(f"   sudo netstat -tulpn | grep :{self.http_port}")
+                print(f"\n3. Kill the process using the port")
+                print(f"\n4. Try common alternative ports: 8081, 8082, 9000, 3000")
+            else:
+                print(f"❌ HTTP Server error: {e}")
+            import sys
+            sys.exit(1)
 
     def start(self):
         """Start both HTTP and WebSocket servers"""
@@ -210,12 +241,20 @@ class WebGameServer:
         http_thread = threading.Thread(target=self.start_http_server, daemon=True)
         http_thread.start()
 
+        # Give HTTP server time to start
+        import time
+        time.sleep(0.5)
+
         # Start WebSocket server
         try:
             asyncio.run(self.start_websocket_server())
         except KeyboardInterrupt:
             print("\n⚠️  Interrupted by user")
             self.running = False
+        except Exception as e:
+            print(f"\n❌ Fatal error: {e}")
+            import sys
+            sys.exit(1)
 
 
 def main():

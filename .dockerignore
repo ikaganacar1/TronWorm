@@ -1,0 +1,48 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+CHANGELOG.md
+*.md
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Terminal version files (not needed for web)
+server.py
+client.py
+renderer.py
+
+# Test files
+test/
+tests/
+*.test.py
+
+# Build artifacts
+build/
+dist/
+*.egg-info/

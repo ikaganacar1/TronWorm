@@ -5,6 +5,7 @@ A fast-paced multiplayer Tron-style worm game where players compete to be the la
 ![Version](https://img.shields.io/badge/version-2.0-blue)
 ![Python](https://img.shields.io/badge/python-3.6+-green)
 ![Platform](https://img.shields.io/badge/platform-web%20%7C%20terminal-orange)
+![Docker](https://img.shields.io/badge/docker-ready-2496ED?logo=docker&logoColor=white)
 
 ---
 
@@ -62,10 +63,24 @@ Control a constantly moving worm that leaves a trail behind it. Avoid crashing i
 
 ### Running the Game
 
-#### 🌐 Web Version (Recommended)
+#### 🐳 Docker (Easiest!)
+
+**Prerequisites:** Docker and Docker Compose installed
+
+```bash
+# Start the game
+docker-compose up -d
+
+# Open http://localhost:8080 in your browser
+```
+
+**📖 See [DOCKER.md](DOCKER.md) for complete Docker documentation**
+
+#### 🌐 Web Version (Python)
 
 **Start the server:**
 ```bash
+pip install -r requirements-web.txt
 python3 web_server.py
 ```
 
@@ -141,10 +156,20 @@ Want to play with friends across the internet? Here are your options:
 ### Option 3: Cloud Deployment
 
 Deploy to a cloud service for permanent hosting:
-- **DigitalOcean** - $5/month droplet
+- **DigitalOcean** - $5/month droplet with Docker
 - **AWS EC2** - Free tier available
 - **Heroku** - Free tier for hobby projects
 - **Fly.io** - Free tier with custom domains
+
+**Using Docker for deployment:**
+```bash
+# On your cloud server
+git clone https://github.com/ikaganacar1/TronWorm.git
+cd TronWorm
+docker-compose up -d
+```
+
+See [DOCKER.md](DOCKER.md) for detailed cloud deployment instructions.
 
 ---
 
@@ -337,12 +362,19 @@ Inspired by:
 
 ## 🎮 Ready to Play?
 
+**With Docker (Recommended):**
 ```bash
-# Start the server
-python3 web_server.py
-
+docker-compose up -d
 # Open http://localhost:8080 in your browser
-# Invite friends or play solo!
 ```
+
+**Without Docker:**
+```bash
+pip install -r requirements-web.txt
+python3 web_server.py
+# Open http://localhost:8080 in your browser
+```
+
+**Invite friends or play solo!**
 
 **Have fun and may the best worm win! 🏆🐍**

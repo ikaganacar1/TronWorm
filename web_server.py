@@ -20,13 +20,43 @@ from game import GameState
 def get_local_ip():
     """Get the local IP address of the server"""
     try:
-        # Create a socket to determine local IP
+        # Try multiple methods to get the real LAN IP
+        import socket
+
+        # Method 1: Get all network interfaces and find the best one
+        hostname = socket.gethostname()
+        ip_addresses = socket.getaddrinfo(hostname, None)
+
+        # Filter and prioritize IPs
+        lan_ips = []
+        for addr_info in ip_addresses:
+            ip = addr_info[4][0]
+            # Skip localhost, IPv6, and Docker IPs
+            if ip.startswith('127.') or ':' in ip:
+                continue
+            # Skip Docker bridge network (172.17.x.x, 172.18.x.x)
+            if ip.startswith('172.17.') or ip.startswith('172.18.'):
+                continue
+            # Prefer common LAN ranges
+            if ip.startswith('10.') or ip.startswith('192.168.') or ip.startswith('172.'):
+                lan_ips.append(ip)
+
+        if lan_ips:
+            # Return first valid LAN IP (prefer 10.x over 192.168.x)
+            lan_ips.sort(key=lambda x: (0 if x.startswith('10.') else 1))
+            return lan_ips[0]
+
+        # Method 2: Create a connection to determine route
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # Doesn't need to be reachable
-        s.connect(('10.255.255.255', 1))
+        s.connect(('8.8.8.8', 80))
         ip = s.getsockname()[0]
         s.close()
-        return ip
+
+        # Filter out Docker IPs from method 2 as well
+        if not ip.startswith('172.17.') and not ip.startswith('172.18.'):
+            return ip
+
+        return '127.0.0.1'
     except Exception:
         return '127.0.0.1'
 

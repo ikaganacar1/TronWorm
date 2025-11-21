@@ -24,11 +24,11 @@ RUN useradd -m -u 1000 tronworm && \
 USER tronworm
 
 # Expose ports
-EXPOSE 8080 8765
+EXPOSE 8081 8766
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD python -c "import socket; s=socket.socket(); s.connect(('localhost', 8080)); s.close()" || exit 1
+    CMD python -c "import socket; s=socket.socket(); s.connect(('localhost', 8081)); s.close()" || exit 1
 
 # Run the web server
 CMD ["python", "web_server.py", "--host", "0.0.0.0"]

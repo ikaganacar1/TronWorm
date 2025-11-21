@@ -56,15 +56,16 @@ def get_local_ip():
         if not ip.startswith('172.17.') and not ip.startswith('172.18.'):
             return ip
 
-        return '127.0.0.1'
+        # Fallback to common server IP
+        return '10.67.67.195'
     except Exception:
-        return '127.0.0.1'
+        return '10.67.67.195'
 
 
 class WebGameServer:
     """WebSocket game server for browser clients"""
 
-    def __init__(self, host='0.0.0.0', ws_port=8766, http_port=8081, width=DEFAULT_GRID_WIDTH, height=DEFAULT_GRID_HEIGHT):
+    def __init__(self, host='0.0.0.0', ws_port=8766, http_port=8081, width=DEFAULT_GRID_WIDTH, height=DEFAULT_GRID_HEIGHT, server_ip=None):
         self.host = host
         self.ws_port = ws_port
         self.http_port = http_port
@@ -73,7 +74,7 @@ class WebGameServer:
         self.player_names = {}  # player_id -> name
         self.running = False
         self.next_player_id = 1
-        self.local_ip = get_local_ip()
+        self.local_ip = server_ip if server_ip else get_local_ip()
 
     async def handle_client(self, websocket):
         """Handle a WebSocket client connection"""
@@ -350,6 +351,7 @@ def main():
     parser.add_argument('--host', default='0.0.0.0', help='Server host (default: 0.0.0.0)')
     parser.add_argument('--ws-port', type=int, default=8766, help='WebSocket port (default: 8766)')
     parser.add_argument('--http-port', type=int, default=8081, help='HTTP port (default: 8081)')
+    parser.add_argument('--server-ip', type=str, default=None, help='Server IP for clients (auto-detected if not specified)')
     parser.add_argument('--width', type=int, default=DEFAULT_GRID_WIDTH, help=f'Grid width (default: {DEFAULT_GRID_WIDTH})')
     parser.add_argument('--height', type=int, default=DEFAULT_GRID_HEIGHT, help=f'Grid height (default: {DEFAULT_GRID_HEIGHT})')
 
@@ -366,7 +368,7 @@ def main():
         print("   pip install -r requirements-web.txt")
         return
 
-    server = WebGameServer(args.host, args.ws_port, args.http_port, args.width, args.height)
+    server = WebGameServer(args.host, args.ws_port, args.http_port, args.width, args.height, args.server_ip)
     server.start()
 
 

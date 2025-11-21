@@ -10,8 +10,8 @@ MAX_PLAYERS = 5
 MIN_PLAYERS = 2
 
 # Game settings
-DEFAULT_GRID_WIDTH = 120  # Larger for 1920x1080 displays
-DEFAULT_GRID_HEIGHT = 60  # Larger for 1920x1080 displays
+DEFAULT_GRID_WIDTH = 160  # Wider field for better gameplay
+DEFAULT_GRID_HEIGHT = 45  # Less tall, more wide
 DEFAULT_FPS = 30
 TICK_RATE = 1.0 / DEFAULT_FPS
 

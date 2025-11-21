@@ -1,388 +1,348 @@
 # 🐍 Tron Worm - Multiplayer Snake Battle
 
-A fast-paced multiplayer Tron-style worm game available in two versions:
+A fast-paced multiplayer Tron-style worm game where players compete to be the last one alive. Leave trails, dodge opponents, collect bonuses, and dominate the arena!
 
-- **🌐 Web Version** - Play in your browser! (RECOMMENDED)
-- **💻 Terminal Version** - Classic CLI experience
-
-## 🚀 Quick Start
-
-### Web Version (Easiest!)
-
-```bash
-pip install websockets
-python3 web_server.py
-# Open http://localhost:8080 in your browser
-```
-
-**📖 See [WEB_README.md](WEB_README.md) for complete web version documentation**
-
-### Terminal Version
-
-```bash
-python3 server.py          # Start server
-python3 client.py localhost --name YourName  # Connect
-```
+![Version](https://img.shields.io/badge/version-2.0-blue)
+![Python](https://img.shields.io/badge/python-3.6+-green)
+![Platform](https://img.shields.io/badge/platform-web%20%7C%20terminal-orange)
 
 ---
 
-## 🎮 Game Description
+## 🎮 Game Overview
 
-Tron Worm is a multiplayer snake game where 2-5 players compete in real-time over a local network. Each player controls a constantly moving "worm" that leaves a trail behind it. The goal is simple: avoid crashing into walls, your own trail, or other players' trails. Last worm alive wins the round!
+Control a constantly moving worm that leaves a trail behind it. Avoid crashing into walls, your own trail, or other players' trails. Collect golden bonuses to increase your trail length and gain an advantage. Last worm alive wins the round!
+
+**Play locally or over the internet!**
+
+---
 
 ## ✨ Features
 
-### Core Gameplay
-- **2-5 players** simultaneously over LAN
-- **Real-time multiplayer** with low latency
-- **Continuous movement** - your worm never stops!
-- **Death on collision** - walls, own trail, or other players = death
-- **Round-based scoring** - multiple rounds with score tracking
+### 🎯 Gameplay
+- **Multiplayer or Solo** - 2-5 players online or practice alone
+- **Real-time Action** - Smooth 30 FPS gameplay
+- **Collectible Bonuses** - Golden orbs increase your trail length (+50)
+- **Dynamic Difficulty** - Speed increases as the round progresses
+- **Fading Trails** - Limited trail length keeps gameplay fast-paced
+- **Large Arena** - 120x60 grid sized for modern displays
 
-### Technical Features
-- **Terminal UI** using curses with colorful ASCII graphics
-- **TCP/IP networking** - one player hosts, others join
-- **30 FPS** smooth rendering
-- **Lobby system** with ready-up mechanism
-- **Countdown** before each round (3...2...1...GO!)
-- **Score tracking** across multiple rounds
-- **Graceful disconnect handling**
-- **Configurable settings** (grid size, port, etc.)
+### 🌐 Connectivity
+- **LAN Multiplayer** - Play with friends on local network
+- **Remote Play** - Play over internet using ngrok or port forwarding
+- **Browser-Based** - No installation needed for players
+- **Cross-Platform** - Works on Windows, Mac, Linux
 
-### Controls
-- **Arrow Keys** or **WASD** - Control worm direction
-- **Space** - Ready up in lobby / Ready for next round
-- **Q** - Quit game
+### 🎨 Technical
+- **Web Version** - HTML5 Canvas with WebSockets (Recommended)
+- **Terminal Version** - Classic CLI with curses (For terminal enthusiasts)
+- **Server-Authoritative** - Fair gameplay, no cheating
+- **Lobby System** - Ready-up mechanism with countdown
+- **Score Tracking** - Multiple rounds with persistent scores
 
-## 📋 Requirements
+---
+
+## 🚀 Quick Start
+
+### Requirements
 
 - **Python 3.6+**
-- **Linux** (tested on Ubuntu, should work on most Unix-like systems)
-- **Terminal** with color support
-- **Local network** for multiplayer
+- **pip** (Python package manager)
 
-## 🚀 Installation
+### Installation
 
-### 1. Clone or download this repository
+1. **Clone or download this repository:**
+   ```bash
+   cd expert-broccoli
+   ```
 
+2. **Install dependencies:**
+   ```bash
+   pip install websockets
+   ```
+
+### Running the Game
+
+#### 🌐 Web Version (Recommended)
+
+**Start the server:**
 ```bash
-cd expert-broccoli
+python3 web_server.py
 ```
 
-### 2. No additional dependencies needed!
+**Play the game:**
+- Open your browser to: **http://localhost:8080**
+- Enter your name and connect to: **ws://localhost:8765**
+- Wait for friends to join or click "Start Solo Practice"
 
-The game uses only Python standard library modules:
-- `socket` - networking
-- `threading` - concurrent connections
-- `curses` - terminal UI
-- `json`, `struct`, `time`, `argparse` - utilities
-
-All of these are included with Python by default on Linux.
-
-### 3. Make scripts executable (optional)
-
+**Server options:**
 ```bash
-chmod +x server.py client.py
+python3 web_server.py --http-port 8080 --ws-port 8765 --width 120 --height 60
 ```
 
-## 🎯 How to Play
+#### 💻 Terminal Version
 
-### Step 1: Start the Server
-
-One player needs to host the game server. On the host machine:
-
+**Start the server:**
 ```bash
 python3 server.py
 ```
 
-This will start the server on `0.0.0.0:9999` (accessible from any network interface).
-
-**Server options:**
+**Connect clients:**
 ```bash
-python3 server.py --host 0.0.0.0 --port 9999 --width 80 --height 40
+python3 client.py localhost --name YourName
 ```
 
-- `--host` - Server host address (default: 0.0.0.0)
-- `--port` - Server port (default: 9999)
-- `--width` - Grid width (default: 80)
-- `--height` - Grid height (default: 40)
+---
 
-**The server will display:**
-```
-🎮 Tron Worm Server started on 0.0.0.0:9999
-📊 Grid size: 80x40
-👥 Max players: 5
-⏱️  Target FPS: 30
+## 🌍 Playing Remotely (Internet)
 
-Waiting for players to connect...
-```
+Want to play with friends across the internet? Here are your options:
 
-### Step 2: Find the Server IP
+### Option 1: Using ngrok (Easiest)
 
-On the host machine, find the local IP address:
+**ngrok** creates a secure tunnel to your local server with a public URL.
 
-```bash
-hostname -I
-# or
-ip addr show
-```
+1. **Install ngrok:**
+   - Download from [ngrok.com/download](https://ngrok.com/download)
+   - Or use: `brew install ngrok` (Mac) / `sudo snap install ngrok` (Linux)
 
-Look for an address like `192.168.1.100` on your local network.
+2. **Start your game server:**
+   ```bash
+   python3 web_server.py
+   ```
 
-### Step 3: Connect Clients
+3. **Create tunnels (in separate terminals):**
+   ```bash
+   # Terminal 2: HTTP tunnel
+   ngrok http 8080
 
-Each player runs the client and connects to the server:
+   # Terminal 3: WebSocket tunnel
+   ngrok http 8765
+   ```
 
-```bash
-python3 client.py 192.168.1.100
-```
+4. **Share the URLs with friends:**
+   - ngrok shows URLs like: `https://abc123.ngrok.io`
+   - HTTP tunnel URL → For accessing the game page
+   - WebSocket tunnel URL → For game connection (use `wss://` instead of `https://`)
 
-Replace `192.168.1.100` with the actual server IP address.
+**Example:**
+- Game page: `https://xyz789.ngrok.io`
+- WebSocket: `wss://abc123.ngrok.io`
 
-**Client options:**
-```bash
-python3 client.py 192.168.1.100 --port 9999 --name "YourName"
-```
+### Option 2: Port Forwarding (Permanent)
 
-- First argument: Server hostname/IP (required)
-- `--port` - Server port (default: 9999)
-- `--name` - Your player name (will prompt if not provided)
+1. **Forward ports 8080 and 8765** in your router settings
+2. **Find your public IP:** `curl ifconfig.me`
+3. **Share with friends:**
+   - Game page: `http://YOUR_PUBLIC_IP:8080`
+   - WebSocket: `ws://YOUR_PUBLIC_IP:8765`
 
-### Step 4: Ready Up and Play!
+⚠️ **Security:** Port forwarding exposes your server directly. Consider firewall rules.
 
-1. **Lobby**: Players see the lobby screen with all connected players
-2. **Ready Up**: Each player presses **SPACE** to ready up (✓ appears next to name)
-3. **Countdown**: When all players are ready, a 3-2-1-GO countdown begins
-4. **Play**: Control your worm with arrow keys or WASD
-5. **Round End**: Winner is announced, scores displayed
-6. **Next Round**: Press **SPACE** to ready for another round
+### Option 3: Cloud Deployment
 
-## 🎨 Game Screen
+Deploy to a cloud service for permanent hosting:
+- **DigitalOcean** - $5/month droplet
+- **AWS EC2** - Free tier available
+- **Heroku** - Free tier for hobby projects
+- **Fly.io** - Free tier with custom domains
 
-```
-═══════════════════════════════════════════════════════════════════════
-║                                                                       ║
-║  ●●●●●                                                               ║
-║      ●                                                                ║
-║      ●                                                                ║
-║      ●                                              ▓▓▓▓●            ║
-║                                                         ▓            ║
-║                                                         ▓            ║
-║                                                         ▓            ║
-║                                                                       ║
-║                   ░░░                                                ║
-║                   ░                                                  ║
-║               ●●●●░                                                  ║
-║                                                                       ║
-═══════════════════════════════════════════════════════════════════════
-Round: 3    Speed: 12.5
-Scores: Alice:2  Bob:1  Charlie:0
-```
+---
 
-Each player gets a unique color and character!
+## 🎯 How to Play
+
+### Controls
+
+**Web Version:**
+- **Arrow Keys** or **WASD** - Control worm direction
+- **Mouse** - Click buttons in menus
+
+**Terminal Version:**
+- **Arrow Keys** or **WASD** - Control worm direction
+- **Space** - Ready up / Ready for next round
+- **Q** - Quit game
+
+### Game Flow
+
+1. **Lobby** - Wait for players to join
+2. **Ready Up** - Click "Ready" or press Space
+3. **Countdown** - 3... 2... 1... GO!
+4. **Play** - Avoid walls and trails, collect bonuses
+5. **Round End** - Winner announced with scores
+6. **Next Round** - Ready up for another round
+
+### Game Mechanics
+
+- **Movement** - Your worm moves continuously in the current direction
+- **No Reverse** - Can't reverse direction (prevents instant death)
+- **Collision = Death** - Hit walls, trails, or yourself → you die
+- **Trail Fading** - Trails are limited to 30 cells (increases with bonuses)
+- **Bonuses** - Collect golden orbs to increase trail length by 50 cells
+- **Speed Increase** - Game gradually speeds up as the round progresses
+- **Scoring** - Last worm alive wins the round and earns a point
+
+---
 
 ## 🏆 Gameplay Tips
 
-1. **Don't Reverse** - You can't reverse direction (prevents instant death)
-2. **Speed Increases** - Game gets faster over time, stay alert!
-3. **Corner Strategy** - Use corners to trap opponents
-4. **Open Space** - Stay in open areas early game
-5. **Wall Riding** - Advanced: ride along walls for control
+1. **Early Game** - Stay in open space, avoid congestion
+2. **Collect Bonuses** - Longer trail = more flexibility
+3. **Corner Traps** - Use corners to box in opponents
+4. **Wall Riding** - Advanced: stay near walls for better control
+5. **Prediction** - Anticipate where opponents will move
+6. **Strategic Death** - Sometimes sacrifice to trap an opponent
+
+---
 
 ## 🔧 Configuration
 
 Edit `config.py` to customize game settings:
 
 ```python
-# Network settings
-DEFAULT_PORT = 9999
-MAX_PLAYERS = 5
-MIN_PLAYERS = 2
-
 # Game settings
-DEFAULT_GRID_WIDTH = 80
-DEFAULT_GRID_HEIGHT = 40
-DEFAULT_FPS = 30
+DEFAULT_GRID_WIDTH = 120    # Arena width
+DEFAULT_GRID_HEIGHT = 60    # Arena height
+DEFAULT_FPS = 30            # Target frames per second
 
 # Worm settings
-INITIAL_SPEED = 10  # Moves per second
-SPEED_INCREMENT = 0.5
-MAX_SPEED = 20
+TRAIL_LENGTH = 30           # Initial trail length
+TRAIL_BONUS_INCREASE = 50   # Bonus trail length from collectibles
+INITIAL_SPEED = 10          # Starting moves per second
+MAX_SPEED = 20              # Maximum speed cap
+
+# Bonus settings
+MAX_BONUSES = 8             # Number of bonuses on field
+BONUS_RESPAWN_TIME = 5      # Seconds between bonus spawns
+
+# Network settings
+DEFAULT_PORT = 9999         # Terminal server port
 ```
 
-## 🐛 Troubleshooting
-
-### "setupterm: could not find terminfo database"
-This error occurs when curses can't find terminal information. **Quick fixes:**
-
-1. **Set TERM environment variable:**
-   ```bash
-   export TERM=xterm-256color
-   python3 client.py localhost
-   ```
-
-2. **Install ncurses terminfo database:**
-   ```bash
-   # Ubuntu/Debian
-   sudo apt-get install ncurses-base ncurses-bin
-
-   # Fedora/RHEL
-   sudo dnf install ncurses
-
-   # Alpine Linux
-   apk add ncurses-terminfo
-   ```
-
-3. **Check your TERM variable:**
-   ```bash
-   echo $TERM
-   # Should show: xterm, xterm-256color, screen, etc.
-   # If empty, set it: export TERM=xterm
-   ```
-
-4. **For Docker/minimal environments:**
-   - Make sure `ncurses-base` package is installed in your container
-   - Add to Dockerfile: `RUN apt-get install -y ncurses-base` (Debian/Ubuntu)
-
-### "Connection refused"
-- Make sure the server is running
-- Check the IP address is correct
-- Verify firewall isn't blocking port 9999
-- Ensure both machines are on the same network
-
-### Terminal too small
-- Resize your terminal to at least 80x40
-- Or use smaller grid: `python3 server.py --width 60 --height 30`
-
-### Choppy gameplay
-- Check network latency
-- Reduce grid size for better performance
-- Close other network applications
-
-### Colors not showing
-- Make sure your terminal supports colors
-- Try a different terminal emulator (gnome-terminal, konsole, etc.)
-
-## 🌐 Network Setup
-
-### Playing on Same Machine (Testing)
-```bash
-# Terminal 1: Server
-python3 server.py
-
-# Terminal 2: Client 1
-python3 client.py localhost
-
-# Terminal 3: Client 2
-python3 client.py localhost
-```
-
-### Playing on Local Network
-```bash
-# Host machine: Start server
-python3 server.py
-
-# Find host IP
-hostname -I
-
-# Other machines: Connect to host
-python3 client.py 192.168.1.100
-```
-
-### Firewall Configuration
-If connections fail, allow port 9999:
-
-```bash
-# Ubuntu/Debian
-sudo ufw allow 9999/tcp
-
-# Fedora/RHEL
-sudo firewall-cmd --add-port=9999/tcp
-```
+---
 
 ## 📁 Project Structure
 
 ```
 expert-broccoli/
-├── server.py       # Game server (host runs this)
-├── client.py       # Game client (players run this)
-├── game.py         # Core game logic (worm movement, collisions)
-├── renderer.py     # Terminal rendering with curses
-├── protocol.py     # Network message protocol
-├── config.py       # Game configuration and constants
-└── README.md       # This file
+├── web/
+│   ├── index.html      # Web game UI
+│   ├── style.css       # Tron-themed styling
+│   └── game.js         # Client-side game logic
+├── web_server.py       # WebSocket game server (Web version)
+├── server.py           # TCP game server (Terminal version)
+├── client.py           # Terminal game client
+├── game.py             # Core game logic (Worm, GameState, Bonuses)
+├── renderer.py         # Terminal rendering with curses
+├── protocol.py         # Network message protocol
+├── config.py           # Game configuration
+└── README.md           # This file
 ```
 
-## 🔨 Architecture
+---
 
-**Server-Authoritative Model:**
-- Server controls all game logic and state
-- Clients send input, receive game state
-- Server broadcasts state to all clients 30 times/second
-- Prevents cheating, ensures consistency
+## 🐛 Troubleshooting
 
-**Networking:**
-- Length-prefixed JSON messages over TCP
-- Reliable delivery with automatic reconnection handling
-- Low latency optimized for real-time gameplay
+### Web Version
 
-**Threading:**
-- Server: One thread per client + game loop thread
-- Client: Receive thread + main rendering/input thread
+**Connection Issues:**
+- Check server is running: `python3 web_server.py`
+- Verify WebSocket URL is correct (ws:// or wss://)
+- Check firewall isn't blocking ports 8080/8765
+- For ngrok: Make sure both tunnels are running
 
-## 🎓 Code Overview
+**Port Already in Use:**
+```bash
+# Use different ports
+python3 web_server.py --http-port 8081 --ws-port 8766
+```
 
-### Key Classes
+**Game Lagging:**
+- Close other applications using network/CPU
+- Reduce browser tab count
+- Check internet connection (for remote play)
 
-**`GameState` (game.py)**
-- Manages overall game state
-- Tracks all worms, scores, and game phase
-- Handles collision detection and win conditions
+### Terminal Version
 
-**`Worm` (game.py)**
-- Represents individual player's worm
-- Stores position, direction, trail
-- Handles movement and direction changes
+**"setupterm: could not find terminfo database"**
+```bash
+# Set TERM variable
+export TERM=xterm-256color
 
-**`Renderer` (renderer.py)**
-- Curses-based terminal rendering
-- Different screens for lobby, countdown, gameplay, round end
-- Colorful ASCII graphics
+# Install ncurses (Ubuntu/Debian)
+sudo apt-get install ncurses-base ncurses-bin
+```
 
-**`GameServer` (server.py)**
-- TCP server handling multiple clients
-- Game loop running at target FPS
-- Broadcasts state to all connected clients
+**Connection Refused:**
+- Verify server is running
+- Check IP address is correct
+- Ensure firewall allows port 9999
+- Confirm both machines on same network
 
-**`GameClient` (client.py)**
-- Connects to server
-- Handles input and rendering
-- Receives and applies game state updates
+**Terminal Too Small:**
+- Resize terminal to at least 80x40
+- Or use smaller grid: `--width 60 --height 30`
 
-## 🚧 Future Enhancements
+---
 
-Ideas for extending the game:
+## 🏗️ Architecture
 
-- **Power-ups**: Speed boost, invincibility, trail erase
-- **Game modes**: Team mode, time limit, elimination
-- **Spectator mode**: Watch after elimination
-- **Replay system**: Review last round
-- **Leaderboard**: Persistent stats across games
-- **Sound effects**: Terminal beep on events
-- **AI players**: Practice against bots
-- **Custom maps**: Obstacles and barriers
+### Server-Authoritative Model
+- **Server** controls all game logic and state
+- **Clients** send input, receive game state updates
+- **Broadcast** state to all clients at 30 FPS
+- **Benefits**: Fair gameplay, no cheating, consistency
+
+### Networking
+- **Web**: WebSocket protocol with asyncio
+- **Terminal**: TCP with length-prefixed JSON messages
+- **Low Latency**: Optimized for real-time gameplay
+- **Reliable**: Automatic disconnect handling
+
+### Game Loop
+1. Server receives player inputs
+2. Updates game state (movement, collisions, bonuses)
+3. Broadcasts state to all connected clients
+4. Clients render the current state
+5. Repeat at 30 FPS
+
+---
+
+## 🚀 Future Ideas
+
+Potential enhancements:
+- **Power-ups**: Speed boost, invincibility, ghost mode
+- **Game Modes**: Teams, elimination, time attack
+- **Custom Maps**: Obstacles and barriers
+- **Spectator Mode**: Watch after dying
+- **Replays**: Review and share best rounds
+- **Leaderboard**: Track stats across sessions
+- **AI Opponents**: Practice against bots
+- **Mobile Support**: Touch controls for phones
+
+---
 
 ## 📝 License
 
 This is a learning project - feel free to modify and share!
 
+---
+
 ## 🙏 Credits
 
 Inspired by:
-- **Tron** (1982 film) - Light cycle battles
+- **Tron** (1982) - Light cycle battles
 - **Snake** - Classic arcade game
 - **Achtung, die Kurve!** - Multiplayer worm game
 
 ---
+
+## 🎮 Ready to Play?
+
+```bash
+# Start the server
+python3 web_server.py
+
+# Open http://localhost:8080 in your browser
+# Invite friends or play solo!
+```
 
 **Have fun and may the best worm win! 🏆🐍**

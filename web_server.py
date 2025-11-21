@@ -11,15 +11,30 @@ import websockets
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 import threading
 import os
+import socket
 from pathlib import Path
 from config import *
 from game import GameState
 
 
+def get_local_ip():
+    """Get the local IP address of the server"""
+    try:
+        # Create a socket to determine local IP
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # Doesn't need to be reachable
+        s.connect(('10.255.255.255', 1))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return '127.0.0.1'
+
+
 class WebGameServer:
     """WebSocket game server for browser clients"""
 
-    def __init__(self, host='0.0.0.0', ws_port=8765, http_port=8080, width=DEFAULT_GRID_WIDTH, height=DEFAULT_GRID_HEIGHT):
+    def __init__(self, host='0.0.0.0', ws_port=8766, http_port=8081, width=DEFAULT_GRID_WIDTH, height=DEFAULT_GRID_HEIGHT):
         self.host = host
         self.ws_port = ws_port
         self.http_port = http_port
@@ -28,6 +43,7 @@ class WebGameServer:
         self.player_names = {}  # player_id -> name
         self.running = False
         self.next_player_id = 1
+        self.local_ip = get_local_ip()
 
     async def handle_client(self, websocket):
         """Handle a WebSocket client connection"""
@@ -214,16 +230,46 @@ class WebGameServer:
             web_dir = Path(__file__).parent / 'web'
             os.chdir(web_dir)
 
+            # Create custom handler with access to server instance
+            server_instance = self
+
             class CustomHandler(SimpleHTTPRequestHandler):
                 def log_message(self, format, *args):
                     pass  # Suppress HTTP logs
+
+                def do_GET(self):
+                    # If requesting index.html, inject the server URL
+                    if self.path == '/' or self.path == '/index.html':
+                        try:
+                            with open('index.html', 'r', encoding='utf-8') as f:
+                                content = f.read()
+
+                            # Replace the placeholder with actual server IP and port
+                            server_url = f"ws://{server_instance.local_ip}:{server_instance.ws_port}"
+                            content = content.replace('placeholder="ws://localhost:8765"', f'placeholder="{server_url}"')
+                            content = content.replace('value="ws://localhost:8765"', f'value="{server_url}"')
+
+                            # Send response
+                            self.send_response(200)
+                            self.send_header('Content-type', 'text/html; charset=utf-8')
+                            self.send_header('Content-Length', str(len(content.encode('utf-8'))))
+                            self.end_headers()
+                            self.wfile.write(content.encode('utf-8'))
+                        except Exception as e:
+                            self.send_error(500, f'Error: {e}')
+                    else:
+                        # For other files, use default handler
+                        super().do_GET()
 
             httpd = HTTPServer((self.host, self.http_port), CustomHandler)
             print(f"🌐 HTTP server started on http://{self.host}:{self.http_port}")
             print(f"📊 Grid size: {self.game_state.width}x{self.game_state.height}")
             print(f"👥 Max players: {MAX_PLAYERS}")
-            print(f"\n🎮 Open in browser: http://localhost:{self.http_port}")
-            print(f"   Or: http://<your-ip>:{self.http_port}\n")
+            print(f"🔗 Local IP: {self.local_ip}")
+            print(f"\n🎮 Open in browser:")
+            print(f"   Local:  http://localhost:{self.http_port}")
+            print(f"   Network: http://{self.local_ip}:{self.http_port}")
+            print(f"\n📡 WebSocket: ws://{self.local_ip}:{self.ws_port}\n")
             print("Waiting for players to connect...\n")
 
             httpd.serve_forever()
@@ -272,8 +318,8 @@ def main():
 
     parser = argparse.ArgumentParser(description='Tron Worm Web Game Server')
     parser.add_argument('--host', default='0.0.0.0', help='Server host (default: 0.0.0.0)')
-    parser.add_argument('--ws-port', type=int, default=8765, help='WebSocket port (default: 8765)')
-    parser.add_argument('--http-port', type=int, default=8080, help='HTTP port (default: 8080)')
+    parser.add_argument('--ws-port', type=int, default=8766, help='WebSocket port (default: 8766)')
+    parser.add_argument('--http-port', type=int, default=8081, help='HTTP port (default: 8081)')
     parser.add_argument('--width', type=int, default=DEFAULT_GRID_WIDTH, help=f'Grid width (default: {DEFAULT_GRID_WIDTH})')
     parser.add_argument('--height', type=int, default=DEFAULT_GRID_HEIGHT, help=f'Grid height (default: {DEFAULT_GRID_HEIGHT})')
 

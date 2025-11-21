@@ -48,6 +48,12 @@ class Worm:
         self.body.appendleft(new_head)
         self.trail.add(new_head)
 
+    def get_next_position(self):
+        """Get the next position without moving"""
+        head_x, head_y = self.get_head()
+        dx, dy = DIRECTIONS[self.direction]
+        return (head_x + dx, head_y + dy)
+
     def die(self):
         """Mark worm as dead"""
         self.alive = False
@@ -193,13 +199,13 @@ class GameState:
                 MAX_SPEED
             )
 
-        # Move all living worms
+        # Check collisions BEFORE moving (check where worms will move to)
+        self._check_collisions()
+
+        # Move all living worms (only if they survived collision check)
         for worm in self.worms.values():
             if worm.alive:
                 worm.move()
-
-        # Check collisions
-        self._check_collisions()
 
         # Check win condition
         alive_worms = [w for w in self.worms.values() if w.alive]
@@ -212,16 +218,17 @@ class GameState:
             if not worm.alive:
                 continue
 
-            head_x, head_y = worm.get_head()
+            # Get where the worm WILL move to
+            next_x, next_y = worm.get_next_position()
 
             # Check wall collision
-            if (head_x < 0 or head_x >= self.width or
-                    head_y < 0 or head_y >= self.height):
+            if (next_x < 0 or next_x >= self.width or
+                    next_y < 0 or next_y >= self.height):
                 worm.die()
                 continue
 
-            # Check collision with own trail (excluding current head)
-            if len(worm.body) > 1 and (head_x, head_y) in list(worm.trail)[:-1]:
+            # Check collision with own trail (before moving there)
+            if (next_x, next_y) in worm.trail:
                 worm.die()
                 continue
 
@@ -229,8 +236,8 @@ class GameState:
             for other_worm in self.worms.values():
                 if other_worm.player_id == worm.player_id:
                     continue
-                # Check if head collides with other worm's trail
-                if (head_x, head_y) in other_worm.trail:
+                # Check if next position collides with other worm's trail
+                if (next_x, next_y) in other_worm.trail:
                     worm.die()
                     break
 

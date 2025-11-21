@@ -19,6 +19,7 @@ TICK_RATE = 1.0 / DEFAULT_FPS
 INITIAL_SPEED = 10  # Moves per second
 SPEED_INCREMENT = 0.5  # Speed increase per 10 seconds
 MAX_SPEED = 20
+TRAIL_LENGTH = 150  # Maximum trail length (old positions fade after this)
 
 # Countdown settings
 COUNTDOWN_SECONDS = 3

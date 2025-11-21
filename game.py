@@ -21,8 +21,9 @@ class Worm:
         # Worm body is a list of (x, y) coordinates
         # Head is at index 0
         self.body = deque([(start_x, start_y)])
-        self.trail = set()  # Set of all positions ever occupied
-        self.trail.add((start_x, start_y))
+        # Trail with limited length - old positions automatically removed
+        self.trail = deque([(start_x, start_y)], maxlen=TRAIL_LENGTH)
+        self.trail_set = {(start_x, start_y)}  # For fast collision detection
 
     def get_head(self):
         """Get the head position"""
@@ -46,7 +47,15 @@ class Worm:
 
         # Add new head position
         self.body.appendleft(new_head)
-        self.trail.add(new_head)
+
+        # Check if trail is full and remove oldest position from trail_set
+        if len(self.trail) == TRAIL_LENGTH:
+            oldest = self.trail[0]  # About to be removed by deque
+            self.trail_set.discard(oldest)
+
+        # Add new position
+        self.trail.append(new_head)
+        self.trail_set.add(new_head)
 
     def get_next_position(self):
         """Get the next position without moving"""
@@ -84,7 +93,10 @@ class Worm:
         worm.alive = data['alive']
         worm.char = data['char']
         worm.body = deque(data['body'])
-        worm.trail = set(tuple(pos) for pos in data['trail'])
+        # Restore trail as deque with maxlen
+        trail_data = data['trail']
+        worm.trail = deque(trail_data, maxlen=TRAIL_LENGTH)
+        worm.trail_set = set(tuple(pos) for pos in trail_data)
         return worm
 
 
@@ -184,8 +196,8 @@ class GameState:
 
             # Completely reset worm state
             worm.body = deque([(x, y)])
-            worm.trail = set()  # Clear trail first
-            worm.trail.add((x, y))  # Then add starting position
+            worm.trail = deque([(x, y)], maxlen=TRAIL_LENGTH)  # Reset trail with limit
+            worm.trail_set = {(x, y)}  # Reset trail set for collision detection
             worm.direction = direction
             worm.alive = True
             color_id += 1
@@ -249,7 +261,7 @@ class GameState:
                 continue
 
             # Check collision with own trail (before moving there)
-            if (next_x, next_y) in worm.trail:
+            if (next_x, next_y) in worm.trail_set:
                 worm.die()
                 continue
 
@@ -258,7 +270,7 @@ class GameState:
                 if other_worm.player_id == worm.player_id:
                     continue
                 # Check if next position collides with other worm's trail
-                if (next_x, next_y) in other_worm.trail:
+                if (next_x, next_y) in other_worm.trail_set:
                     worm.die()
                     break
 

@@ -188,6 +188,38 @@ MAX_SPEED = 20
 
 ## 🐛 Troubleshooting
 
+### "setupterm: could not find terminfo database"
+This error occurs when curses can't find terminal information. **Quick fixes:**
+
+1. **Set TERM environment variable:**
+   ```bash
+   export TERM=xterm-256color
+   python3 client.py localhost
+   ```
+
+2. **Install ncurses terminfo database:**
+   ```bash
+   # Ubuntu/Debian
+   sudo apt-get install ncurses-base ncurses-bin
+
+   # Fedora/RHEL
+   sudo dnf install ncurses
+
+   # Alpine Linux
+   apk add ncurses-terminfo
+   ```
+
+3. **Check your TERM variable:**
+   ```bash
+   echo $TERM
+   # Should show: xterm, xterm-256color, screen, etc.
+   # If empty, set it: export TERM=xterm
+   ```
+
+4. **For Docker/minimal environments:**
+   - Make sure `ncurses-base` package is installed in your container
+   - Add to Dockerfile: `RUN apt-get install -y ncurses-base` (Debian/Ubuntu)
+
 ### "Connection refused"
 - Make sure the server is running
 - Check the IP address is correct

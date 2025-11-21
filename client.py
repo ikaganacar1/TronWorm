@@ -201,7 +201,33 @@ class GameClient:
             time.sleep(1)  # Brief pause before starting curses
 
             # Run curses interface
-            curses.wrapper(self.run_curses)
+            try:
+                curses.wrapper(self.run_curses)
+            except curses.error as e:
+                error_msg = str(e)
+                print("\n" + "="*70)
+                print("❌ TERMINAL ERROR")
+                print("="*70)
+                if "setupterm" in error_msg or "terminfo" in error_msg:
+                    print("\nThe terminal database (terminfo) could not be found.")
+                    print("\n🔧 QUICK FIXES:\n")
+                    print("1. Set TERM environment variable:")
+                    print("   export TERM=xterm-256color")
+                    print("   python3 client.py", self.host, f"--name {self.player_name}")
+                    print("\n2. Install ncurses (if missing):")
+                    print("   Ubuntu/Debian: sudo apt-get install ncurses-base")
+                    print("   Fedora/RHEL:   sudo dnf install ncurses")
+                    print("   Alpine:        apk add ncurses-terminfo")
+                    print("\n3. Check your TERM variable:")
+                    print("   echo $TERM")
+                    print("   (should show: xterm, xterm-256color, screen, etc.)")
+                    print("\n4. If in Docker/minimal environment:")
+                    print("   Make sure ncurses-base package is installed")
+                else:
+                    print(f"\nError: {error_msg}")
+                    print("\nMake sure you're running in a proper terminal emulator.")
+                print("="*70)
+                return False
 
             return True
 

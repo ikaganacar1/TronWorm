@@ -103,6 +103,7 @@ class GameState:
         self.current_speed = INITIAL_SPEED
         self.countdown_start = None
         self.last_winner = None
+        self.move_count = 0  # Track moves in current round
 
     def add_player(self, player_id, name):
         """Add a new player to the game"""
@@ -163,6 +164,7 @@ class GameState:
         self.game_start_time = time.time()
         self.current_speed = INITIAL_SPEED
         self.ready_players.clear()
+        self.move_count = 0  # Reset move counter
 
         # Reset all worms
         color_id = 0
@@ -180,8 +182,10 @@ class GameState:
             else:
                 x, y, direction = self.width // 2, self.height // 2, 'RIGHT'
 
+            # Completely reset worm state
             worm.body = deque([(x, y)])
-            worm.trail = {(x, y)}
+            worm.trail = set()  # Clear trail first
+            worm.trail.add((x, y))  # Then add starting position
             worm.direction = direction
             worm.alive = True
             color_id += 1
@@ -207,10 +211,14 @@ class GameState:
             if worm.alive:
                 worm.move()
 
-        # Check win condition
-        alive_worms = [w for w in self.worms.values() if w.alive]
-        if len(alive_worms) <= 1:
-            self._end_round()
+        self.move_count += 1
+
+        # Check win condition (but not on first few moves to avoid instant end)
+        # Wait at least 3 moves to let worms separate from start positions
+        if self.move_count >= 3:
+            alive_worms = [w for w in self.worms.values() if w.alive]
+            if len(alive_worms) <= 1:
+                self._end_round()
 
     def _check_collisions(self):
         """Check for collisions with walls and trails"""
@@ -271,7 +279,8 @@ class GameState:
             'round_number': self.round_number,
             'current_speed': self.current_speed,
             'countdown_start': self.countdown_start,
-            'last_winner': self.last_winner
+            'last_winner': self.last_winner,
+            'move_count': self.move_count
         }
 
     @staticmethod
@@ -289,4 +298,5 @@ class GameState:
         game.current_speed = data['current_speed']
         game.countdown_start = data['countdown_start']
         game.last_winner = data.get('last_winner')
+        game.move_count = data.get('move_count', 0)
         return game

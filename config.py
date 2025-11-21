@@ -33,8 +33,8 @@ COLORS = [
     ('CYAN', 6),
 ]
 
-# Worm characters for different players
-WORM_CHARS = ['█', '▓', '▒', '░', '●']
+# Worm characters for different players (all solid blocks for clean UI)
+WORM_CHARS = ['█', '█', '█', '█', '█']
 
 # Direction vectors
 DIRECTIONS = {

@@ -451,6 +451,30 @@ class TronWormClient {
             this.ctx.stroke();
         }
 
+        // Draw bonuses
+        if (this.gameState.bonuses) {
+            this.gameState.bonuses.forEach(bonus => {
+                const centerX = bonus.x * cellSize + cellSize / 2;
+                const centerY = bonus.y * cellSize + cellSize / 2;
+                const radius = cellSize / 3;
+
+                // Draw glowing circle for bonus
+                this.ctx.fillStyle = '#FFD700'; // Gold color
+                this.ctx.shadowBlur = 15;
+                this.ctx.shadowColor = '#FFD700';
+                this.ctx.beginPath();
+                this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.shadowBlur = 0;
+
+                // Draw inner highlight
+                this.ctx.fillStyle = '#FFFF00';
+                this.ctx.beginPath();
+                this.ctx.arc(centerX - radius/3, centerY - radius/3, radius/3, 0, Math.PI * 2);
+                this.ctx.fill();
+            });
+        }
+
         // Draw worms
         Object.values(this.gameState.worms).forEach(worm => {
             const color = COLORS[worm.color_id];

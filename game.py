@@ -3,6 +3,7 @@ Core game logic for Tron Worm
 """
 
 import time
+import random
 from collections import deque
 from config import *
 
@@ -22,7 +23,8 @@ class Worm:
         # Head is at index 0
         self.body = deque([(start_x, start_y)])
         # Trail with limited length - old positions automatically removed
-        self.trail = deque([(start_x, start_y)], maxlen=TRAIL_LENGTH)
+        self.max_trail_length = TRAIL_LENGTH  # Can be increased by bonuses
+        self.trail = deque([(start_x, start_y)], maxlen=self.max_trail_length)
         self.trail_set = {(start_x, start_y)}  # For fast collision detection
 
     def get_head(self):
@@ -48,14 +50,21 @@ class Worm:
         # Add new head position
         self.body.appendleft(new_head)
 
-        # Check if trail is full and remove oldest position from trail_set
-        if len(self.trail) == TRAIL_LENGTH:
-            oldest = self.trail[0]  # About to be removed by deque
-            self.trail_set.discard(oldest)
-
-        # Add new position
+        # Add new position to trail
         self.trail.append(new_head)
         self.trail_set.add(new_head)
+
+        # Remove old positions if trail exceeds max length
+        while len(self.trail) > self.max_trail_length:
+            oldest = self.trail.popleft()
+            self.trail_set.discard(oldest)
+
+    def increase_trail_length(self, amount):
+        """Increase maximum trail length"""
+        self.max_trail_length += amount
+        # Create new deque with updated maxlen
+        old_trail = list(self.trail)
+        self.trail = deque(old_trail, maxlen=self.max_trail_length)
 
     def get_next_position(self):
         """Get the next position without moving"""
@@ -100,6 +109,30 @@ class Worm:
         return worm
 
 
+class Bonus:
+    """Represents a collectible bonus on the field"""
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.collected = False
+
+    def to_dict(self):
+        """Convert bonus to dictionary for network transmission"""
+        return {
+            'x': self.x,
+            'y': self.y,
+            'collected': self.collected
+        }
+
+    @staticmethod
+    def from_dict(data):
+        """Create bonus from dictionary"""
+        bonus = Bonus(data['x'], data['y'])
+        bonus.collected = data['collected']
+        return bonus
+
+
 class GameState:
     """Manages the game state"""
 
@@ -116,6 +149,8 @@ class GameState:
         self.countdown_start = None
         self.last_winner = None
         self.move_count = 0  # Track moves in current round
+        self.bonuses = []  # Active bonuses on the field
+        self.last_bonus_spawn = None  # Time when last bonus was spawned
 
     def add_player(self, player_id, name):
         """Add a new player to the game"""
@@ -169,6 +204,28 @@ class GameState:
         self.state = STATE_COUNTDOWN
         self.countdown_start = time.time()
 
+    def spawn_bonus(self):
+        """Spawn a new bonus at a random empty position"""
+        if len(self.bonuses) >= MAX_BONUSES:
+            return
+
+        # Find empty position (not occupied by worms or trails)
+        max_attempts = 100
+        for _ in range(max_attempts):
+            x = random.randint(5, self.width - 5)
+            y = random.randint(5, self.height - 5)
+
+            # Check if position is free
+            position_free = True
+            for worm in self.worms.values():
+                if (x, y) in worm.trail_set:
+                    position_free = False
+                    break
+
+            if position_free:
+                self.bonuses.append(Bonus(x, y))
+                break
+
     def start_round(self):
         """Start a new round"""
         self.state = STATE_PLAYING
@@ -177,6 +234,8 @@ class GameState:
         self.current_speed = INITIAL_SPEED
         self.ready_players.clear()
         self.move_count = 0  # Reset move counter
+        self.bonuses = []  # Clear bonuses
+        self.last_bonus_spawn = time.time()
 
         # Reset all worms
         color_id = 0
@@ -196,11 +255,16 @@ class GameState:
 
             # Completely reset worm state
             worm.body = deque([(x, y)])
-            worm.trail = deque([(x, y)], maxlen=TRAIL_LENGTH)  # Reset trail with limit
+            worm.trail = deque([(x, y)], maxlen=worm.max_trail_length)  # Use worm's max trail length
             worm.trail_set = {(x, y)}  # Reset trail set for collision detection
             worm.direction = direction
             worm.alive = True
+            worm.max_trail_length = TRAIL_LENGTH  # Reset trail length to default
             color_id += 1
+
+        # Spawn initial bonuses
+        for _ in range(MAX_BONUSES):
+            self.spawn_bonus()
 
     def update(self):
         """Update game state (move worms, check collisions)"""
@@ -222,6 +286,14 @@ class GameState:
         for worm in self.worms.values():
             if worm.alive:
                 worm.move()
+
+        # Check bonus collection
+        self._check_bonus_collection()
+
+        # Spawn new bonuses periodically
+        if self.last_bonus_spawn and time.time() - self.last_bonus_spawn >= BONUS_RESPAWN_TIME:
+            self.spawn_bonus()
+            self.last_bonus_spawn = time.time()
 
         self.move_count += 1
 
@@ -274,6 +346,24 @@ class GameState:
                     worm.die()
                     break
 
+    def _check_bonus_collection(self):
+        """Check if any worm collected a bonus"""
+        for worm in self.worms.values():
+            if not worm.alive:
+                continue
+
+            head_x, head_y = worm.get_head()
+
+            # Check each bonus
+            for bonus in self.bonuses:
+                if not bonus.collected and bonus.x == head_x and bonus.y == head_y:
+                    # Worm collected the bonus!
+                    bonus.collected = True
+                    worm.increase_trail_length(TRAIL_BONUS_INCREASE)
+
+        # Remove collected bonuses
+        self.bonuses = [b for b in self.bonuses if not b.collected]
+
     def _end_round(self):
         """End the current round"""
         self.state = STATE_ROUND_END
@@ -317,7 +407,8 @@ class GameState:
             'current_speed': self.current_speed,
             'countdown_start': self.countdown_start,
             'last_winner': self.last_winner,
-            'move_count': self.move_count
+            'move_count': self.move_count,
+            'bonuses': [bonus.to_dict() for bonus in self.bonuses]
         }
 
     @staticmethod
@@ -336,4 +427,5 @@ class GameState:
         game.countdown_start = data['countdown_start']
         game.last_winner = data.get('last_winner')
         game.move_count = data.get('move_count', 0)
+        game.bonuses = [Bonus.from_dict(b) for b in data.get('bonuses', [])]
         return game

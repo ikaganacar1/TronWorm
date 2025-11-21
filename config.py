@@ -10,8 +10,8 @@ MAX_PLAYERS = 5
 MIN_PLAYERS = 2
 
 # Game settings
-DEFAULT_GRID_WIDTH = 80
-DEFAULT_GRID_HEIGHT = 40
+DEFAULT_GRID_WIDTH = 120  # Larger for 1920x1080 displays
+DEFAULT_GRID_HEIGHT = 60  # Larger for 1920x1080 displays
 DEFAULT_FPS = 30
 TICK_RATE = 1.0 / DEFAULT_FPS
 
@@ -19,7 +19,12 @@ TICK_RATE = 1.0 / DEFAULT_FPS
 INITIAL_SPEED = 10  # Moves per second
 SPEED_INCREMENT = 0.5  # Speed increase per 10 seconds
 MAX_SPEED = 20
-TRAIL_LENGTH = 150  # Maximum trail length (old positions fade after this)
+TRAIL_LENGTH = 30  # Smaller trail that fades quickly
+TRAIL_BONUS_INCREASE = 50  # How much trail length increases when collecting bonus
+
+# Bonus settings
+MAX_BONUSES = 8  # Maximum number of bonuses on field at once
+BONUS_RESPAWN_TIME = 5  # Seconds before new bonus spawns
 
 # Countdown settings
 COUNTDOWN_SECONDS = 3
